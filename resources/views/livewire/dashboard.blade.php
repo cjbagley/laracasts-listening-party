@@ -1,22 +1,51 @@
 <?php
 
 use Livewire\Volt\Component;
+use App\Models\ListeningParty;
+use Livewire\Attributes\Validate;
 
 new class extends Component {
+    #[Validate('required|string|max:255')]
     public string $name = '';
 
-    public $start_time;
+    #[Validate('required|url')]
+    public string $podcastUrl = '';
 
-    public function createListeningParty() {}
+    #[Validate('required')]
+    public $startTime;
+
+    public function createListeningParty()
+    {
+        $this->validate();
+    }
 
     public function with(): array
     {
         return [
-            'listening_parties' => \App\Models\ListeningParty::all(),
+            'listening_parties' => ListeningParty::all(),
         ];
     }
 }; ?>
 
-<div>
-    Hello, World!
+<div class="flex items-center justify-center min-h-screen bg-slate-50">
+    <div class="max-w-lg w-full px-4">
+        <form wire:submit='createListeningParty' class="space-y-6">
+            <x-input wire:model="podcastUrl"
+                     id="podcastUrl"
+                     description="{{__('app.episode.description')}}"
+                     label="{{__('app.episode.url')}}"
+                     placeholder="{{__('app.episode.url')}}">
+            </x-input>
+            <x-input wire:model="name"
+                     id="name"
+                     label="{{__('app.listening_party.name')}}"
+                     placeholder="{{__('app.listening_party.name')}}">
+            </x-input>
+            <x-datetime-picker wire:model="startTime"
+                               label="{{__('app.listening_party.start_time')}}"
+                               placeholder="{{__('app.listening_party.start_time')}}">
+            </x-datetime-picker>
+            <x-button wire:click="createListeningParty()" primary>{{__('app.listening_party.create')}}</x-button>
+        </form>
+    </div>
 </div>
