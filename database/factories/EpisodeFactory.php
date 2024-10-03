@@ -17,7 +17,8 @@ class EpisodeFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'title' => $this->faker->sentence(5),
+            'media_url' => $this->faker->url(),
         ];
     }
 }

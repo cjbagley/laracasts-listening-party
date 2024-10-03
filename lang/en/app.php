@@ -7,8 +7,8 @@ return [
         'start_time' => 'Listening Party Start Time',
     ],
     'episode' => [
-        'description' => 'Direct Episode Link or YouTube Link, RSS feeds will grab the latest episode',
+        'description' => 'Entering the RSS feeds will grab the latest episode',
         'name' => 'Podcast Episode Name',
-        'url' => 'Podcast Episode URL',
+        'url' => 'Podcast RRS Feed URL',
     ],
 ];

@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Routing\Redirector;
 use Livewire\Volt\Component;
 use App\Models\ListeningParty;
 use App\Models\Episode;
@@ -15,7 +16,7 @@ new class extends Component {
     #[Validate('required')]
     public $startTime;
 
-    public function createListeningParty()
+    public function createListeningParty(): Redirector
     {
         $this->validate();
 
@@ -29,7 +30,7 @@ new class extends Component {
             'start_time' => $this->startTime,
         ]);
 
-        return redirect()->route('parties.show', $listening_party);
+        return redirect()->route('parties.show', $listening_party, $episode);
     }
 
     public function with(): array
@@ -53,6 +54,7 @@ new class extends Component {
                      placeholder="{{__('app.listening_party.name')}}">
             </x-input>
             <x-datetime-picker wire:model="startTime"
+                               :min="now()->subDay()"
                                label="{{__('app.listening_party.start_time')}}"
                                placeholder="{{__('app.listening_party.start_time')}}">
             </x-datetime-picker>

@@ -2,6 +2,7 @@
 
 use App\Models\Episode;
 use App\Models\ListeningParty;
+use Carbon\Carbon;
 use Livewire\Volt\Volt;
 
 it('loads dashboard component', function () {
@@ -43,6 +44,6 @@ it('successfully processes form', function (string $name, string $url, string $s
     $listeningParty = ListeningParty::first();
     expect($listeningParty->name)->toBe($name)
         ->and($listeningParty->episode->media_url)->toBe($url)
-        ->and($listeningParty->start_time)->toBe($startTime);
+        ->and($listeningParty->start_time->toDateTimeString())->toBe(Carbon::create($startTime)->toDateTimeString());
 
 })->with([['Test', 'https://test.com', '2024-09-30T23:00:00']]);

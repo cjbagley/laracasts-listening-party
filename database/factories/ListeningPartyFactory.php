@@ -17,7 +17,9 @@ class ListeningPartyFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'name' => $this->faker->sentence(5),
+            'is_active' => true,
+            'start_time' => $this->faker->dateTimeBetween('-1 day', '+5 days'),
         ];
     }
 }

@@ -16,7 +16,7 @@ class Episode extends Model
 
     public function podcasts(): BelongsTo
     {
-        return $this->belongsTo(Podcast::class);
+        return $this->belongsTo(Podcast::class, 'podcast_id', 'id');
     }
 
     public function listeningParties(): HasMany

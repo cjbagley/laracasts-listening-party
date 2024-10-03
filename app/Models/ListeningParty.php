@@ -17,8 +17,8 @@ class ListeningParty extends Model
     {
         return [
             'is_active' => 'boolean',
-            'start_date' => 'datetime',
-            'end_date' => 'datetime',
+            'start_time' => 'datetime',
+            'end_time' => 'datetime',
         ];
     }
 
