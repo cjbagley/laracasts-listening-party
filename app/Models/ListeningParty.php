@@ -22,7 +22,7 @@ class ListeningParty extends Model
         ];
     }
 
-    public function episodes(): BelongsTo
+    public function episode(): BelongsTo
     {
         return $this->belongsTo(Episode::class);
     }
