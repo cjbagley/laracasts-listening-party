@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 
 /**
  * App\Models\ListeningParty
@@ -32,5 +33,10 @@ class ListeningParty extends Model
     public function episode(): BelongsTo
     {
         return $this->belongsTo(Episode::class);
+    }
+
+    public function podcast(): HasOneThrough
+    {
+        return $this->hasOneThrough(Podcast::class, Episode::class, 'id', 'id', 'episode_id', 'podcast_id');
     }
 }
