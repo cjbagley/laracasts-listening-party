@@ -58,7 +58,7 @@ class ProcessPodcastUrl implements ShouldQueue
             'rss_url' => $this->url,
         ]);
 
-        $this->episode->podcasts()->associate($podcast);
+        $this->episode->podcast()->associate($podcast);
         $this->episode->save();
         $this->episode->update([
             'title' => $data['episode_title'],
