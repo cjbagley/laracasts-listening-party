@@ -2,6 +2,7 @@
 
 return [
     'listening_party' => [
+        'ongoing' => 'Ongoing Listening parties',
         'create' => 'Create Listening Party',
         'name' => 'Listening Party Name',
         'start_time' => 'Listening Party Start Time',

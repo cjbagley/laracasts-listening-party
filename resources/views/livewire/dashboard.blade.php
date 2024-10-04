@@ -76,21 +76,65 @@ new class extends Component {
     </div>
 
     <div class="my-20">
-        @forelse ($listening_parties as $listening_party)
-            <div wire:key="{{ $listening_party->id }}">
-                @if($listening_party->episode->podcast?->artwork_url)
-                    <x-avatar src="{{ $listening_party->episode->podcast->artwork_url }}"
-                              size="xl"
-                              rounded="full">
-                    </x-avatar>
-                @endif
-                <p>{{ $listening_party->name }}</p>
-                <p>{{ $listening_party->episode->title }}</p>
-                <p>{{ $listening_party->podcast->title }}</p>
-                <p>{{ $listening_party->start_time }}</p>
+        <div class="max-w-lg mx-auto">
+            <h3 class="mb-8 text-lg font-bold font-serif">{{ __('app.listening_party.ongoing')  }}</h3>
+            <div class="bg-white rounded-lg shadow-lg">
+                @forelse ($listening_parties as $listening_party)
+                    <div wire:key="{{ $listening_party->id }}">
+                        <a href="{{ route('parties.show', $listening_party) }}" class="block">
+                            <div
+                                class="flex items-center justify-between p-4 border-b border-gray-200 hover:bg-gray-50 transition duration-150 ease-in-out">
+                                <div class="flex items-center space-x-4">
+                                    @if($listening_party->episode->podcast?->artwork_url)
+                                        <div class="shrink-0">
+                                            <x-avatar src="{{ $listening_party->episode->podcast->artwork_url }}"
+                                                      alt="Podcast Network"
+                                                      size="xl"
+                                                      rounded="sm">
+                                            </x-avatar>
+                                        </div>
+                                    @endif
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-[0.9rem] text-base font-semibold truncate text-slate-500">{{ $listening_party->name }}</p>
+                                        <p class="text-sm truncate text-slate-500">{{ $listening_party->episode->title }}</p>
+                                        <p class="text-slate-400 uppercase tracking-tight text-xs">{{ $listening_party->podcast->title }}</p>
+                                        <p class="mt-1 text-xs">{{ $listening_party->start_time }}</p>
+                                    </div>
+                                    <div class="text-xs text-slate-500 mt-1" x-data="{
+                                        startTime: '{{ $listening_party->start_time->toIso8601String() }}',
+                                        countdownText: '',
+                                        isLive: {{ $listening_party->start_time->isPast() && $listening_party->is_active ? 'true': 'false' }},
+                                        updateCountdown() {
+                                            const start = new Date(this.startTime).getTime();
+                                            const now = new Date().getTime();
+                                            const distance = start - now;
+                                            if (distance < 0) {
+                                                this.countdownText = 'Started';
+                                                this.isLive = true;
+                                            } else {
+                                                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                                                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                                                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                                                const seconds = Math.floor((distance % (1000 * 60)) / (1000));
+                                                this.countdownText = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+                                            }
+                                        }
+                                    }" x-init="updateCountdown(); setInterval(updateCountdown, 1000);">
+                                        <div x-show="isLive">
+                                            <x-badge flat rose label="Live"></x-badge>
+                                        </div>
+                                        <div x-show="!isLive">
+                                            Starts in <span x-text="countdownText"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                @empty
+                    <div>{{__('app.listening_party.empty')}}</div>
+                @endforelse
             </div>
-        @empty
-            <div>{{__('app.listening_party.empty')}}</div>
-        @endforelse
+        </div>
     </div>
 </div>
