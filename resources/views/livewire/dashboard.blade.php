@@ -40,6 +40,7 @@ new class extends Component {
     {
         return [
             'listening_parties' => ListeningParty::where('is_active', '=', true)
+                ->whereNotNull('end_time')
                 ->orderBy('start_time', 'asc')
                 ->with('episode.podcast')
                 ->get(),
@@ -96,7 +97,7 @@ new class extends Component {
                                     @endif
                                     <div class="flex-1 min-w-0">
                                         <p class="text-[0.9rem] text-base font-semibold truncate text-slate-500">{{ $listening_party->name }}</p>
-                                        <p class="text-sm truncate text-slate-500">{{ $listening_party->episode->title }}</p>
+                                        <p class="text-sm truncate text-slate-500 max-w-xs">{{ $listening_party->episode->title }}</p>
                                         <p class="text-slate-400 uppercase tracking-tight text-xs">{{ $listening_party->podcast->title }}</p>
                                         <p class="mt-1 text-xs">{{ $listening_party->start_time }}</p>
                                     </div>
@@ -133,7 +134,8 @@ new class extends Component {
                         </a>
                     </div>
                 @empty
-                    <div>{{__('app.listening_party.empty')}}</div>
+                    <div
+                        class="flex items-center justify-center p-6 font-serif text-sm">{{__('app.listening_party.empty')}}</div>
                 @endforelse
             </div>
         </div>
