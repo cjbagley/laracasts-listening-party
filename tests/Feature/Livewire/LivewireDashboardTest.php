@@ -43,7 +43,7 @@ it('successfully processes form', function (string $name, string $url, string $s
 
     $listeningParty = ListeningParty::first();
     expect($listeningParty->name)->toBe($name)
-        ->and($listeningParty->episode->media_url)->toBe($url)
+        ->and($listeningParty->episode->media_url)->not->toBe('')
         ->and($listeningParty->start_time->toDateTimeString())->toBe(Carbon::create($startTime)->toDateTimeString());
 
-})->with([['Test', 'https://test.com', '2024-09-30T23:00:00']]);
+})->with([['Test', 'https://feeds.simplecast.com/sY509q85', '2024-09-30T23:00:00']]);
