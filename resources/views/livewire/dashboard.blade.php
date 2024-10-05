@@ -119,7 +119,7 @@ new class extends Component {
                                                 this.countdownText = `${days}d ${hours}h ${minutes}m ${seconds}s`;
                                             }
                                         }
-                                    }" x-init="updateCountdown(); setInterval(updateCountdown, 1000);">
+                                    }" x-init="updateCountdown(); setInterval(() => updateCountdown(), 1000);">
                                         <div x-show="isLive">
                                             <x-badge flat rose label="Live"></x-badge>
                                         </div>
@@ -128,6 +128,7 @@ new class extends Component {
                                         </div>
                                     </div>
                                 </div>
+                                <x-button flat xs class="w-20">Join</x-button>
                             </div>
                         </a>
                     </div>
