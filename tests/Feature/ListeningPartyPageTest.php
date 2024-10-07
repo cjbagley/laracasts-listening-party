@@ -10,5 +10,5 @@ it('loads listening party page successfully', function () {
     $this->get(route('parties.show', $lp))
         ->assertStatus(200)
         ->assertSee($lp->name)
-        ->assertSee(__('app.listening_party.preparing'));
+        ->assertSee(__('app.listening_party.preparing', ['name' => $lp->name]));
 });
