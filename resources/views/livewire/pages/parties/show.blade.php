@@ -13,10 +13,9 @@ new class extends Component {
 }; ?>
 
 <div>
-    <h2>{{ $listeningParty->name }}</h2>
     @if($listeningParty->end_time === null)
-        <div
-            class="flex items-center justify-center p-6 font-serif text-sm">{{__('app.listening_party.preparing')}}</div>
+        <div wire:poll.5s
+             class="flex items-center justify-center p-6 font-serif text-lg">{{__('app.listening_party.preparing', ['name' => (string)$listeningParty->name])}}</div>
     @else
         <div x-data="{
             audio: null,
@@ -55,7 +54,7 @@ new class extends Component {
                 const remainingSeconds = Math.floor(seconds % 60);
                 return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
             }
-        }">
+        }" x-init="initAudioPlayer()">
 
             <audio x-ref="audioPlayer" :src="'{{ $listeningParty->episode->media_url}}'" preload="auto"></audio>
             <div>{{ $listeningParty->podcast->title }}</div>

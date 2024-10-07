@@ -134,8 +134,7 @@ new class extends Component {
                         </a>
                     </div>
                 @empty
-                    <div
-                        class="flex items-center justify-center p-6 font-serif text-sm">{{__('app.listening_party.empty')}}</div>
+                    <div class="flex items-center justify-center p-6 font-serif text-sm">{{__('app.listening_party.empty')}}</div>
                 @endforelse
             </div>
         </div>
