@@ -64,8 +64,6 @@ new class extends Component {
                 }
                 if (timeUntilStart > 0) {
                     const days = Math.floor(timeUntilStart / this.secondsInDay);
-                    console.log(this.secondsInDay);
-                    console.log(days);
                     const hours = Math.floor((timeUntilStart % this.secondsInDay) / this.secondsInHour);
                     const minutes = Math.floor((timeUntilStart % this.secondsInHour) / this.secondsInMinute);
                     const seconds = timeUntilStart % this.secondsInMinute;
