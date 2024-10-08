@@ -36,12 +36,20 @@ new class extends Component {
             startTimestamp: {{ $this->listening_party->start_time->timestamp }},
             endTimestamp: {{ $this->listening_party->end_time?->timestamp }},
 
+            init() {
+                this.startCountdown();
+                if (this.$refs.audioPlayer && !this.isFinished) {
+                    this.initAudioPlayer();
+                }
+            },
+
+            startCountdown(){
+               this.checkAndUpdate();
+               setTimeout(() => this.checkAndUpdate(), 1000);
+            },
+
             initAudioPlayer() {
                 this.audio = this.$refs.audioPlayer;
-                if (!this.audio) {
-                    return;
-                }
-
                 this.audio.addEventListener('loadedmetadata', (event) => {
                     this.isLoading = false;
                     this.checkAndUpdate();
@@ -94,6 +102,11 @@ new class extends Component {
 
             checkAndUpdate() {
                 const timeUntilStart = this.startTimestamp - this.nowTimestamp();
+
+                if(this.isFinished) {
+                    return;
+                }
+
                 if (timeUntilStart > 0) {
                     const days = Math.floor(timeUntilStart / this.secondsInDay);
                     const hours = Math.floor((timeUntilStart % this.secondsInDay) / this.secondsInHour);
@@ -105,12 +118,10 @@ new class extends Component {
                     return;
                 }
 
-                if (!this.isPlaying && !this.isFinished) {
-                    this.currentTime = this.elapsedTime();
-                    this.isLive = true;
-                    if (this.isReady) {
-                        this.playAudio();
-                    }
+                this.currentTime = this.elapsedTime();
+                this.isLive = true;
+                if (this.isReady) {
+                    this.playAudio();
                 }
             },
 
@@ -129,9 +140,14 @@ new class extends Component {
             joinAndBeReady() {
                 this.isReady = true;
 
+                if (!this.audio) {
+                    return;
+                }
+
                 if (!this.isLive) {
                     return;
                 }
+
                 if (this.isFinished) {
                     return;
                 }
@@ -144,7 +160,7 @@ new class extends Component {
                 const remainingSeconds = Math.floor(seconds % 60);
                 return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
             }
-        }" x-init="initAudioPlayer">
+        }" x-init="init()">
     @if($this->listening_party->end_time === null)
         <div wire:poll.5s
              class="flex items-center justify-center p-6 font-serif text-lg">{{__('app.listening_party.preparing', ['name' => $this->listening_party->name])}}</div>
@@ -158,7 +174,7 @@ new class extends Component {
         </div>
     @else
         <audio x-ref="audioPlayer" :src="'{{ $this->listening_party->episode->media_url}}'" preload="auto"></audio>
-        <div x-show="!isLive"
+        <div x-cloak x-show="!isLive"
              class="flex items-center justify-center min-h-screen bg-emerald-50">
             <div class="w-full max-w-2xl shadow-lg rounded-lg bg-white p-8">
                 <div class="flex items-center space-x-4">
@@ -185,7 +201,8 @@ new class extends Component {
                    class="text-lg text-green-600 font-bolder text-center">{{__('app.listening_party.ready')}}</p>
             </div>
         </div>
-        <div x-show="isLive">
+        <div x-cloak
+             x-show="isLive">
             <div>{{ $this->listening_party->podcast->title }}</div>
             <div>{{ $this->listening_party->episode->title }}</div>
             <div>Current Time: <span x-text="formatTime(currentTime)"></span></div>
