@@ -6,6 +6,7 @@ use Livewire\Volt\Component;
 
 new class extends Component {
     public ListeningParty $listening_party;
+
     public bool $is_finished = false;
 
     public function mount(ListeningParty $listeningParty)
@@ -14,7 +15,8 @@ new class extends Component {
         if (!$this->listening_party->is_active) {
             $this->is_finished = true;
         }
-        if (Carbon::now()->greaterThan($this->listening_party->end_time)) {
+
+        if ($this->listening_party->end_time !== null && Carbon::now()->greaterThan($this->listening_party->end_time)) {
             $this->is_finished = true;
         }
     }
