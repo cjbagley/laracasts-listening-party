@@ -102,7 +102,7 @@ new class extends Component {
                 return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
             }
         }" x-init="initAudioPlayer">
-    @if($listeningParty->end_time === null)
+    @if($this->listening_party->end_time === null)
         <div wire:poll.5s
              class="flex items-center justify-center p-6 font-serif text-lg">{{__('app.listening_party.preparing', ['name' => $this->listening_party->name])}}</div>
     @else
