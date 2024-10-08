@@ -95,12 +95,7 @@ new class extends Component {
                                             </x-avatar>
                                         </div>
                                     @endif
-                                    <div class="flex-1 min-w-0">
-                                        <p class="text-[0.9rem] text-base font-semibold truncate text-slate-500">{{ $listening_party->name }}</p>
-                                        <p class="text-sm truncate text-slate-500 max-w-xs">{{ $listening_party->episode->title }}</p>
-                                        <p class="text-slate-400 uppercase tracking-tight text-xs">{{ $listening_party->podcast->title }}</p>
-                                        <p class="mt-1 text-xs">{{ $listening_party->start_time }}</p>
-                                    </div>
+                                    <x-listening-party-info :listening-party="$listening_party"/>
                                     <div class="text-xs text-slate-500 mt-1" x-data="{
                                         startTime: '{{ $listening_party->start_time->timestamp }}',
                                         countdownText: '',
@@ -127,7 +122,7 @@ new class extends Component {
                                             <x-badge flat rose label="Live"></x-badge>
                                         </div>
                                         <div x-show="!isLive">
-                                            Starts in <span x-text="countdownText"></span>
+                                            {{__('app.listening_party.countdown')}}<span x-text="countdownText"></span>
                                         </div>
                                     </div>
                                 </div>

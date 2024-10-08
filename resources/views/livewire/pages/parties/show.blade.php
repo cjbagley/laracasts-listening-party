@@ -8,7 +8,7 @@ new class extends Component {
 
     public function mount(ListeningParty $listeningParty)
     {
-        $this->listeningParty = $listeningParty->load('episode.podcast');
+        $this->listening_party = $listeningParty->load('episode.podcast');
     }
 }; ?>
 
@@ -23,7 +23,7 @@ new class extends Component {
             secondsInDay: 86400,
             secondsInHour: 3600,
             secondsInMinute: 60,
-            startTimestamp: {{ $listeningParty->start_time->timestamp }},
+            startTimestamp: {{ $this->listening_party->start_time->timestamp }},
 
             initAudioPlayer() {
                 this.audio = this.$refs.audioPlayer;
@@ -45,7 +45,7 @@ new class extends Component {
                     this.isPlaying = false;
                 });
 
-                this.audio.src = '{{ $listeningParty->episode->media_url }}'
+                this.audio.src = '{{ $this->listening_party->episode->media_url }}'
                 this.audio.preload = 'auto';
             },
 
@@ -99,21 +99,41 @@ new class extends Component {
         }" x-init="initAudioPlayer">
     @if($listeningParty->end_time === null)
         <div wire:poll.5s
-             class="flex items-center justify-center p-6 font-serif text-lg">{{__('app.listening_party.preparing', ['name' => (string)$listeningParty->name])}}</div>
+             class="flex items-center justify-center p-6 font-serif text-lg">{{__('app.listening_party.preparing', ['name' => $this->listening_party->name])}}</div>
     @else
-        <audio x-ref="audioPlayer" :src="'{{ $listeningParty->episode->media_url}}'" preload="auto"></audio>
+        <audio x-ref="audioPlayer" :src="'{{ $this->listening_party->episode->media_url}}'" preload="auto"></audio>
         <div x-show="!isLive"
              class="flex items-center justify-center min-h-screen bg-emerald-50">
             <div class="w-full max-w-2xl shadow-lg rounded-lg bg-white p-8">
-                <p class="text-slate-900">The show will start in <span x-text="countdownText"></span></p>
+                <div class="flex items-center space-x-4">
+                    @if($this->listening_party->episode->podcast?->artwork_url)
+                        <div class="shrink-0">
+                            <x-avatar src="{{ $this->listening_party->episode->podcast->artwork_url }}"
+                                      alt="Podcast Network"
+                                      size="xl"
+                                      rounded="sm">
+                            </x-avatar>
+                        </div>
+                    @endif
+                    <div class="flex justify-between items-center w-full">
+                        <x-listening-party-info :listening-party="$this->listening_party"/>
+                        <p class="accent-slate-700 text-lg font-bolder">
+                            {{__('app.listening_party.countdown')}}<span x-text="countdownText"></span>
+                        </p>
+                    </div>
+                </div>
+                <x-button x-show="!isReady"
+                          class="w-full mt-8"
+                          @click="joinAndBeReady()">{{__('app.listening_party.join')}}</x-button>
+                <p x-show="isReady"
+                   class="text-lg text-green-600 font-bolder text-center">{{__('app.listening_party.ready')}}</p>
             </div>
-
         </div>
         <div x-show="isLive">
-            <div>{{ $listeningParty->podcast->title }}</div>
-            <div>{{ $listeningParty->episode->title }}</div>
+            <div>{{ $this->listening_party->podcast->title }}</div>
+            <div>{{ $this->listening_party->episode->title }}</div>
             <div>Current Time: <span x-text="formatTime(currentTime)"></span></div>
-            <div>Start Time: {{ $listeningParty->start_time }}</div>
+            <div>Start Time: {{ $this->listening_party->start_time }}</div>
             <div x-show="isLoading">{{ __('app.loading') }}</div>
         </div>
     @endif

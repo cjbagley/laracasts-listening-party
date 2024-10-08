@@ -9,6 +9,9 @@ return [
         'heading' => 'Let\'s listen together',
         'empty' => 'No listening parties started yet...',
         'preparing' => 'Creating your listening party \':Name\'...',
+        'join' => 'Join and be ready',
+        'ready' => 'Ready to start the party!',
+        'countdown' => 'Starts in ',
     ],
     'episode' => [
         'description' => 'Entering the RSS feeds will grab the latest episode',
