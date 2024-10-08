@@ -39,6 +39,7 @@ new class extends Component {
 
                 this.audio.addEventListener('play', () => {
                     this.isPlaying = true;
+                    this.isReady = true;
                 });
 
                 this.audio.addEventListener('pause', () => {
@@ -53,13 +54,17 @@ new class extends Component {
                 return Math.floor(Date.now() / 1000);
             },
 
+            elapsedTime() {
+                return Math.max(0, this.nowTimestamp() - this.startTimestamp);
+            },
+
             checkAndUpdate() {
                 const timeUntilStart = this.startTimestamp - this.nowTimestamp();
-
                 if (timeUntilStart <= 0 && !this.isPlaying) {
+                    this.currentTime = this.elapsedTime();
                     this.isLive = true;
                     if (this.isReady) {
-                        this.audio.play().catch(error => console.error('Playback failed:', error));
+                        this.playAudio();
                     }
                 }
                 if (timeUntilStart > 0) {
@@ -69,26 +74,26 @@ new class extends Component {
                     const seconds = timeUntilStart % this.secondsInMinute;
 
                     this.countdownText = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+                    setTimeout(() => this.checkAndUpdate(), 1000);
                 }
             },
 
             playAudio() {
-                const elapsedTime = Math.max(0, this.nowTimestamp() - this.startTimestamp);
-                this.audio.currentTime = elapsedTime;
+                this.audio.currentTime = this.elapsedTime();
                 this.audio.play().catch(error => {
                     console.error('Playback failed:', error);
                     this.isPlaying = false;
+                    this.isReady = false;
                 });
             },
 
             joinAndBeReady() {
                 this.isReady = true;
-                this.audio.play().then(() => {
-                    this.audio.pause();
-                }).catch(error => {
-                    console.error('Playback failed:', error);
-                    this.isPlaying = false;
-                });
+                if (! this.isLive) {
+                    return;
+                }
+
+               this.playAudio();
             },
 
             formatTime(seconds) {
@@ -135,6 +140,7 @@ new class extends Component {
             <div>Current Time: <span x-text="formatTime(currentTime)"></span></div>
             <div>Start Time: {{ $this->listening_party->start_time }}</div>
             <div x-show="isLoading">{{ __('app.loading') }}</div>
+            <x-button x-show="!isReady" @click="joinAndBeReady()">{{ __('app.listening_party.join') }}</x-button>
         </div>
     @endif
 </div>
