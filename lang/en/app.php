@@ -12,6 +12,11 @@ return [
         'join' => 'Join and be ready',
         'ready' => 'Ready to start the party!',
         'countdown' => 'Starts in ',
+        'ended' => [
+            'header' => 'The listening Party has finished',
+            'thanks' => 'Thank you for joining the ":listeningparty" listening party.',
+            'podcast' => 'The podcast ":podcast" has ended.',
+        ],
     ],
     'episode' => [
         'description' => 'Entering the RSS feeds will grab the latest episode',

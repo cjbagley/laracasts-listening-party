@@ -1,14 +1,22 @@
 <?php
 
 use App\Models\ListeningParty;
+use Carbon\Carbon;
 use Livewire\Volt\Component;
 
 new class extends Component {
-    public ListeningParty $listeningParty;
+    public ListeningParty $listening_party;
+    public bool $is_finished = false;
 
     public function mount(ListeningParty $listeningParty)
     {
         $this->listening_party = $listeningParty->load('episode.podcast');
+        if (!$this->listening_party->is_active) {
+            $this->is_finished = true;
+        }
+        if (Carbon::now()->greaterThan($this->listening_party->end_time)) {
+            $this->is_finished = true;
+        }
     }
 }; ?>
 
@@ -24,9 +32,13 @@ new class extends Component {
             secondsInHour: 3600,
             secondsInMinute: 60,
             startTimestamp: {{ $this->listening_party->start_time->timestamp }},
+            endTimestamp: {{ $this->listening_party->end_time?->timestamp }},
 
             initAudioPlayer() {
                 this.audio = this.$refs.audioPlayer;
+                if (!this.audio) {
+                    return;
+                }
 
                 this.audio.addEventListener('loadedmetadata', (event) => {
                     this.isLoading = false;
@@ -35,6 +47,13 @@ new class extends Component {
 
                 this.audio.addEventListener('timeupdate', () => {
                     this.currentTime = this.audio.currentTime;
+                    if (! this.endTimestamp) {
+                        return;
+                    }
+
+                    if (this.currentTime >= (this.endTimestamp - this.startTimestamp)) {
+                        this.finishListeningParty();
+                    }
                 });
 
                 this.audio.addEventListener('play', () => {
@@ -44,6 +63,10 @@ new class extends Component {
 
                 this.audio.addEventListener('pause', () => {
                     this.isPlaying = false;
+                });
+
+                this.audio.addEventListener('ended', () => {
+                    this.finishListeningParty();
                 });
 
                 this.audio.src = '{{ $this->listening_party->episode->media_url }}'
@@ -58,15 +81,17 @@ new class extends Component {
                 return Math.max(0, this.nowTimestamp() - this.startTimestamp);
             },
 
+            finishListeningParty() {
+                $wire.is_finished = true;
+                $wire.$refresh();
+                this.isPlaying = false;
+                if (this.audio) {
+                    this.audio.pause();
+                }
+            },
+
             checkAndUpdate() {
                 const timeUntilStart = this.startTimestamp - this.nowTimestamp();
-                if (timeUntilStart <= 0 && !this.isPlaying) {
-                    this.currentTime = this.elapsedTime();
-                    this.isLive = true;
-                    if (this.isReady) {
-                        this.playAudio();
-                    }
-                }
                 if (timeUntilStart > 0) {
                     const days = Math.floor(timeUntilStart / this.secondsInDay);
                     const hours = Math.floor((timeUntilStart % this.secondsInDay) / this.secondsInHour);
@@ -75,10 +100,22 @@ new class extends Component {
 
                     this.countdownText = `${days}d ${hours}h ${minutes}m ${seconds}s`;
                     setTimeout(() => this.checkAndUpdate(), 1000);
+                    return;
+                }
+
+                if (!this.isPlaying && !this.isFinished) {
+                    this.currentTime = this.elapsedTime();
+                    this.isLive = true;
+                    if (this.isReady) {
+                        this.playAudio();
+                    }
                 }
             },
 
             playAudio() {
+                if (!this.audio) {
+                    return;
+                }
                 this.audio.currentTime = this.elapsedTime();
                 this.audio.play().catch(error => {
                     console.error('Playback failed:', error);
@@ -89,11 +126,15 @@ new class extends Component {
 
             joinAndBeReady() {
                 this.isReady = true;
-                if (! this.isLive) {
+
+                if (!this.isLive) {
+                    return;
+                }
+                if (this.isFinished) {
                     return;
                 }
 
-               this.playAudio();
+                this.playAudio();
             },
 
             formatTime(seconds) {
@@ -105,6 +146,14 @@ new class extends Component {
     @if($this->listening_party->end_time === null)
         <div wire:poll.5s
              class="flex items-center justify-center p-6 font-serif text-lg">{{__('app.listening_party.preparing', ['name' => $this->listening_party->name])}}</div>
+    @elseif($is_finished)
+        <div class="flex items-center justify-center min-h-screen bg-emerald-50">
+            <div class="w-full max-w-2xl p-8 mx-8 text-center bg-white rounded-lg shadow-lg">
+                <h2 class="mb-4 text-2xl font-bold text-slate-900">{{ __('app.listening_party.ended.header') }}</h2>
+                <p class="text-slate-600">{{ __('app.listening_party.ended.thanks', ['listeningparty' => $this->listening_party->name]) }}</p>
+                <p class="mt-2 text-slate-600">{{__('app.listening_party.ended.podcast', ['podcast' => $this->listening_party->podcast->title]) }}</p>
+            </div>
+        </div>
     @else
         <audio x-ref="audioPlayer" :src="'{{ $this->listening_party->episode->media_url}}'" preload="auto"></audio>
         <div x-show="!isLive"
