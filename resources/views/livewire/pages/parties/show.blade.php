@@ -202,13 +202,28 @@ new class extends Component {
             </div>
         </div>
         <div x-cloak
+             class="flex items-center justify-center min-h-screen bg-emerald-50"
              x-show="isLive">
-            <div>{{ $this->listening_party->podcast->title }}</div>
-            <div>{{ $this->listening_party->episode->title }}</div>
-            <div>Current Time: <span x-text="formatTime(currentTime)"></span></div>
-            <div>Start Time: {{ $this->listening_party->start_time }}</div>
+
+            <div x-show="!isLoading" class="w-full max-w-2xl shadow-lg rounded-lg bg-white p-8">
+                <div class="flex items-center space-x-4">
+                    @if($this->listening_party->episode->podcast?->artwork_url)
+                        <div class="shrink-0">
+                            <x-avatar src="{{ $this->listening_party->episode->podcast->artwork_url }}"
+                                      alt="Podcast Network"
+                                      size="xl"
+                                      rounded="sm">
+                            </x-avatar>
+                        </div>
+                    @endif
+                    <div class="flex flex-col justify-between w-full">
+                        <x-listening-party-info :listening-party="$this->listening_party"/>
+                        <div>Current Time: <span x-text="formatTime(currentTime)"></span></div>
+                        <div>Start Time: {{ $this->listening_party->start_time }}</div>
+                    </div>
+                </div>
+            </div>
             <div x-show="isLoading">{{ __('app.loading') }}</div>
-            <x-button x-show="!isReady" @click="joinAndBeReady()">{{ __('app.listening_party.join') }}</x-button>
         </div>
     @endif
 </div>

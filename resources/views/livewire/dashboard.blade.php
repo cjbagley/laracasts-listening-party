@@ -71,6 +71,7 @@ new class extends Component {
                     <x-button wire:click="createListeningParty()"
                               class="w-full"
                               primary>{{__('app.listening_party.create')}}</x-button>
+                    {{ now() }}
                 </form>
             </x-card>
         </div>
