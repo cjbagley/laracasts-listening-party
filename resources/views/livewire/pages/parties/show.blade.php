@@ -164,13 +164,13 @@ new class extends Component {
         }" x-init="init()">
     @if($listeningParty->end_time === null)
         <div wire:poll.5s
-             class="flex items-center justify-center p-6 font-serif text-lg">{{__('app.listeningParty.preparing', ['name' => $this->listeningParty->name])}}</div>
+             class="flex items-center justify-center p-6 font-serif text-lg">{{__('app.listening_party.preparing', ['name' => $this->listeningParty->name])}}</div>
     @elseif($isFinished)
         <div class="flex items-center justify-center min-h-screen bg-emerald-50">
             <div class="w-full max-w-2xl p-8 mx-8 text-center bg-white rounded-lg shadow-lg">
-                <h2 class="mb-4 text-2xl font-bold text-slate-900">{{ __('app.listeningParty.ended.header') }}</h2>
-                <p class="text-slate-600">{{ __('app.listeningParty.ended.thanks', ['listeningparty' => $listeningParty->name]) }}</p>
-                <p class="mt-2 text-slate-600">{{__('app.listeningParty.ended.podcast', ['podcast' => $listeningParty->podcast->title]) }}</p>
+                <h2 class="mb-4 text-2xl font-bold text-slate-900">{{ __('app.listening_party.ended.header') }}</h2>
+                <p class="text-slate-600">{{ __('app.listening_party.ended.thanks', ['listeningparty' => $listeningParty->name]) }}</p>
+                <p class="mt-2 text-slate-600">{{__('app.listening_party.ended.podcast', ['podcast' => $listeningParty->podcast->title]) }}</p>
             </div>
         </div>
     @else
@@ -199,7 +199,7 @@ new class extends Component {
                           class="w-full mt-8"
                           @click="joinAndBeReady()">{{__('app.listening_party.join')}}</x-button>
                 <p x-show="isReady"
-                   class="text-lg text-green-600 font-bolder text-center">{{__('app.listeningParty.ready')}}</p>
+                   class="text-lg text-green-600 font-bolder text-center">{{__('app.listening_party.ready')}}</p>
             </div>
         </div>
         <div x-cloak
