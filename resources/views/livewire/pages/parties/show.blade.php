@@ -45,7 +45,7 @@ new class extends Component {
 
             startCountdown(){
                this.checkAndUpdate();
-               setTimeout(() => this.checkAndUpdate(), 1000);
+               setInterval(() => this.checkAndUpdate(), 1000);
             },
 
             initAudioPlayer() {
@@ -55,16 +55,14 @@ new class extends Component {
                     this.checkAndUpdate();
                 });
 
-                this.audio.addEventListener('timeupdate', () => {
-                    this.currentTime = this.audio.currentTime;
-                    if (! this.endTimestamp) {
-                        return;
-                    }
 
-                    if (this.currentTime >= (this.endTimestamp - this.startTimestamp)) {
-                        this.finishListeningParty();
-                    }
-                });
+        this.audio.addEventListener('timeupdate', () => {
+            this.currentTime = this.audio.currentTime;
+            if (this.endTimestamp && this.currentTime >= (this.endTimestamp - this.startTimestamp)) {
+                this.finishListeningParty();
+            }
+        });
+
 
                 this.audio.addEventListener('play', () => {
                     this.isPlaying = true;
@@ -114,7 +112,6 @@ new class extends Component {
                     const seconds = timeUntilStart % this.secondsInMinute;
 
                     this.countdownText = `${days}d ${hours}h ${minutes}m ${seconds}s`;
-                    setTimeout(() => this.checkAndUpdate(), 1000);
                     return;
                 }
 
@@ -160,7 +157,16 @@ new class extends Component {
                 const minutes = Math.floor(seconds / 60);
                 const remainingSeconds = Math.floor(seconds % 60);
                 return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
-            }
+    },
+
+    copyToClipboard() {
+        navigator.clipboard.writeText(window.location.href);
+        this.copyNotification = true;
+        setTimeout(() => {
+            this.copyNotification = false;
+        }, 3000);
+    },
+
         }" x-init="init()">
     @if($listeningParty->end_time === null)
         <div wire:poll.5s
