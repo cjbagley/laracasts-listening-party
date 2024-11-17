@@ -5,19 +5,19 @@ use Carbon\Carbon;
 use Livewire\Volt\Component;
 
 new class extends Component {
-    public ListeningParty $listening_party;
+    public ListeningParty $listeningParty;
 
-    public bool $is_finished = false;
+    public bool $isFinished = false;
 
-    public function mount(ListeningParty $listeningParty)
+    public function mount(ListeningParty $listeningParty): void
     {
-        $this->listening_party = $listeningParty->load('episode.podcast');
-        if (!$this->listening_party->is_active) {
-            $this->is_finished = true;
+        $this->listeningParty = $listeningParty->load('episode.podcast');
+        if (!$this->listeningParty->is_active) {
+            $this->isFinished = true;
         }
 
-        if ($this->listening_party->end_time !== null && Carbon::now()->greaterThan($this->listening_party->end_time)) {
-            $this->is_finished = true;
+        if ($this->listeningParty->end_time !== null && Carbon::now()->greaterThan($this->listeningParty->end_time)) {
+            $this->isFinished = true;
         }
     }
 }; ?>
@@ -33,8 +33,8 @@ new class extends Component {
             secondsInDay: 86400,
             secondsInHour: 3600,
             secondsInMinute: 60,
-            startTimestamp: {{ $this->listening_party->start_time->timestamp }},
-            endTimestamp: {{ $this->listening_party->end_time?->timestamp }},
+            startTimestamp: {{ $listeningParty->start_time->timestamp }},
+            endTimestamp: {{ $listeningParty->end_time?->timestamp }},
 
             init() {
                 this.startCountdown();
@@ -79,7 +79,7 @@ new class extends Component {
                     this.finishListeningParty();
                 });
 
-                this.audio.src = '{{ $this->listening_party->episode->media_url }}'
+                this.audio.src = '{{ $listeningParty->episode->media_url }}'
                 this.audio.preload = 'auto';
             },
 
@@ -92,7 +92,7 @@ new class extends Component {
             },
 
             finishListeningParty() {
-                $wire.is_finished = true;
+                $wire.isFinished = true;
                 $wire.$refresh();
                 this.isPlaying = false;
                 if (this.audio) {
@@ -118,6 +118,7 @@ new class extends Component {
                     return;
                 }
 
+                this.countdownText = `Live!`;
                 this.currentTime = this.elapsedTime();
                 this.isLive = true;
                 if (this.isReady) {
@@ -161,26 +162,26 @@ new class extends Component {
                 return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
             }
         }" x-init="init()">
-    @if($this->listening_party->end_time === null)
+    @if($listeningParty->end_time === null)
         <div wire:poll.5s
-             class="flex items-center justify-center p-6 font-serif text-lg">{{__('app.listening_party.preparing', ['name' => $this->listening_party->name])}}</div>
-    @elseif($is_finished)
+             class="flex items-center justify-center p-6 font-serif text-lg">{{__('app.listeningParty.preparing', ['name' => $this->listeningParty->name])}}</div>
+    @elseif($isFinished)
         <div class="flex items-center justify-center min-h-screen bg-emerald-50">
             <div class="w-full max-w-2xl p-8 mx-8 text-center bg-white rounded-lg shadow-lg">
-                <h2 class="mb-4 text-2xl font-bold text-slate-900">{{ __('app.listening_party.ended.header') }}</h2>
-                <p class="text-slate-600">{{ __('app.listening_party.ended.thanks', ['listeningparty' => $this->listening_party->name]) }}</p>
-                <p class="mt-2 text-slate-600">{{__('app.listening_party.ended.podcast', ['podcast' => $this->listening_party->podcast->title]) }}</p>
+                <h2 class="mb-4 text-2xl font-bold text-slate-900">{{ __('app.listeningParty.ended.header') }}</h2>
+                <p class="text-slate-600">{{ __('app.listeningParty.ended.thanks', ['listeningparty' => $listeningParty->name]) }}</p>
+                <p class="mt-2 text-slate-600">{{__('app.listeningParty.ended.podcast', ['podcast' => $listeningParty->podcast->title]) }}</p>
             </div>
         </div>
     @else
-        <audio x-ref="audioPlayer" :src="'{{ $this->listening_party->episode->media_url}}'" preload="auto"></audio>
+        <audio x-ref="audioPlayer" :src="'{{ $listeningParty->episode->media_url}}'" preload="auto"></audio>
         <div x-cloak x-show="!isLive"
              class="flex items-center justify-center min-h-screen bg-emerald-50">
             <div class="w-full max-w-2xl shadow-lg rounded-lg bg-white p-8">
                 <div class="flex items-center space-x-4">
-                    @if($this->listening_party->episode->podcast?->artwork_url)
+                    @if($this->listeningParty->episode->podcast?->artwork_url)
                         <div class="shrink-0">
-                            <x-avatar src="{{ $this->listening_party->episode->podcast->artwork_url }}"
+                            <x-avatar src="{{ $listeningParty->episode->podcast->artwork_url }}"
                                       alt="Podcast Network"
                                       size="xl"
                                       rounded="sm">
@@ -188,7 +189,7 @@ new class extends Component {
                         </div>
                     @endif
                     <div class="flex justify-between items-center w-full">
-                        <x-listening-party-info :listening-party="$this->listening_party"/>
+                        <x-listening-party-info :listening-party="$listeningParty"/>
                         <p class="accent-slate-700 text-lg font-bolder">
                             {{__('app.listening_party.countdown')}}<span x-text="countdownText"></span>
                         </p>
@@ -198,7 +199,7 @@ new class extends Component {
                           class="w-full mt-8"
                           @click="joinAndBeReady()">{{__('app.listening_party.join')}}</x-button>
                 <p x-show="isReady"
-                   class="text-lg text-green-600 font-bolder text-center">{{__('app.listening_party.ready')}}</p>
+                   class="text-lg text-green-600 font-bolder text-center">{{__('app.listeningParty.ready')}}</p>
             </div>
         </div>
         <div x-cloak
@@ -207,9 +208,9 @@ new class extends Component {
 
             <div x-show="!isLoading" class="w-full max-w-2xl shadow-lg rounded-lg bg-white p-8">
                 <div class="flex items-center space-x-4">
-                    @if($this->listening_party->episode->podcast?->artwork_url)
+                    @if($listeningParty->episode->podcast?->artwork_url)
                         <div class="shrink-0">
-                            <x-avatar src="{{ $this->listening_party->episode->podcast->artwork_url }}"
+                            <x-avatar src="{{ $listeningParty->episode->podcast->artwork_url }}"
                                       alt="Podcast Network"
                                       size="xl"
                                       rounded="sm">
@@ -217,9 +218,9 @@ new class extends Component {
                         </div>
                     @endif
                     <div class="flex flex-col justify-between w-full">
-                        <x-listening-party-info :listening-party="$this->listening_party"/>
+                        <x-listening-party-info :listening-party="$listeningParty"/>
                         <div>Current Time: <span x-text="formatTime(currentTime)"></span></div>
-                        <div>Start Time: {{ $this->listening_party->start_time }}</div>
+                        <div>Start Time: {{ $listeningParty->start_time }}</div>
                     </div>
                 </div>
             </div>
