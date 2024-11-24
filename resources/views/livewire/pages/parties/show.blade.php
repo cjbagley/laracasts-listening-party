@@ -35,6 +35,7 @@ new class extends Component {
             secondsInMinute: 60,
             startTimestamp: {{ $listeningParty->start_time->timestamp }},
             endTimestamp: {{ $listeningParty->end_time?->timestamp }},
+            length: {{ $listeningParty->end_time->timestamp - $listeningParty->start_time->timestamp }},
 
             init() {
                 this.startCountdown();
@@ -127,6 +128,7 @@ new class extends Component {
                 if (!this.audio) {
                     return;
                 }
+
                 this.audio.currentTime = this.elapsedTime();
                 this.audio.play().catch(error => {
                     console.error('Playback failed:', error);
@@ -223,10 +225,17 @@ new class extends Component {
                             </x-avatar>
                         </div>
                     @endif
-                    <div class="flex flex-col justify-between w-full">
+                    <div class="w-full">
                         <x-listening-party-info :listening-party="$listeningParty"/>
-                        <div>Current Time: <span x-text="formatTime(currentTime)"></span></div>
-                        <div>Start Time: {{ $listeningParty->start_time }}</div>
+                        <div class="flex flex-row justify-between">
+                            <div x-text="formatTime(currentTime)"></div>
+                            <div x-text="formatTime(length)"></div>
+                        </div>
+                        <div class="h-2 rounded-lg bg-emerald-100">
+                            <div
+                                :style="`width: ${(currentTime / audio.duration) * 100}%`"
+                                class="h-2 rounded-lg bg-emerald-500"></div>
+                        </div>
                     </div>
                 </div>
             </div>
